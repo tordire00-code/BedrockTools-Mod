@@ -1,0 +1,31 @@
+name: Build Examiner
+
+on:
+  push:
+    paths:
+      - "Examiner/**"
+      - ".github/workflows/examiner.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: nttld/setup-ndk@v1
+        id: ndk
+        with:
+          ndk-version: r28c
+
+      - name: Build libExaminer.so
+        run: |
+          CXX=${{ steps.ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++
+          $CXX -std=c++20 -O2 -shared -fPIC -fvisibility=hidden -static-libstdc++ \
+            -Wl,-z,max-page-size=16384 Examiner/examiner.cpp -o libExaminer.so
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libExaminer
+          path: libExaminer.so
+          if-no-files-found: error
