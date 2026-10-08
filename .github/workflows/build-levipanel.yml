@@ -14,6 +14,7 @@ jobs:
           mkdir -p work
           unzip -q "levi-panel-mod (1).zip" -d work
           ls work/levi-panel-mod
+          sed -i "s|ModuleBuilder(kModuleId,|ModuleBuilder(std::string(kModuleId),|" work/levi-panel-mod/src/main.cpp
 
       - name: Setup NDK + CMake + Ninja
         uses: android-actions/setup-android@v3
