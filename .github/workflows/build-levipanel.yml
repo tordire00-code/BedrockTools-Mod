@@ -12,7 +12,7 @@ jobs:
       - name: Unzip project
         run: |
           mkdir -p work
-          unzip -q "levi-panel-mod (1).zip" -d work
+          unzip -q "levi-panel-mod-v2.zip" -d work
           ls work/levi-panel-mod
           sed -i "s|ModuleBuilder(kModuleId,|ModuleBuilder(std::string(kModuleId),|" work/levi-panel-mod/src/main.cpp
 
