@@ -18,7 +18,7 @@ jobs:
       - name: Setup NDK + CMake + Ninja
         uses: android-actions/setup-android@v3
         with:
-          packages: ndk;27.2.12479018 cmake;3.31.6 ninja
+          packages: ndk;27.2.12479018 cmake;3.31.6
 
       - name: Configure
         run: |
