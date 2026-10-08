@@ -1,0 +1,10 @@
+{
+  "type": "preload-native",
+  "name": "Simple Panel",
+  "author": "Tu",
+  "version": "1.0.0",
+  "entry": "libpanelmod.so",
+  "minecraft_versions": [],
+  "overwrite_files": [],
+  "overwrite_folders": []
+}

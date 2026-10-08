@@ -1,3 +1,5 @@
+set_policy("check.auto_ignore_flags", false)
+set_policy("check.auto_ignore_flags", false)
 add_rules("mode.debug", "mode.release")
 set_policy("package.requires_lock", true)
 
