@@ -2,43 +2,46 @@ name: build-levipack
 on:
   push:
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Unzip project
         run: |
           mkdir -p work
-          unzip -q "levi-panel-mod-v2.zip" -d work
-          ls work/levi-panel-mod
-          sed -i "s|ModuleBuilder(kModuleId,|ModuleBuilder(std::string(kModuleId),|" work/levi-panel-mod/src/main.cpp
-
-      - name: Setup NDK + CMake + Ninja
+          unzip -q levi-panel-mod-v3.zip -d work
+      - name: Setup NDK + CMake
         uses: android-actions/setup-android@v3
         with:
           packages: ndk;27.2.12479018 cmake;3.31.6
-
       - name: Configure
         run: |
           cmake -S work/levi-panel-mod -B build/android -G Ninja \
             -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk/27.2.12479018/build/cmake/android.toolchain.cmake \
-            -DANDROID_ABI=arm64-v8a \
-            -DANDROID_PLATFORM=android-24 \
+            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 \
             -DCMAKE_BUILD_TYPE=Release
-
+      - name: Show SDK API
+        if: always()
+        run: |
+          H=build/android/_deps/preloader-src/include/pl/ModMenu.hpp
+          grep -n -E "onConfigChanged|onKeybind|setModule|struct ModuleInfo|class ModuleBuilder" "$H" || true
+          mkdir -p sdk-include
+          cp -r build/android/_deps/preloader-src/include/pl sdk-include/ || true
+      - name: Upload SDK headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-headers
+          path: sdk-include
       - name: Build
         run: cmake --build build/android --target panelmod
-
       - name: Package .levipack
         run: |
           mkdir -p dist/panelmod
           cp work/levi-panel-mod/manifest.json dist/panelmod/
           cp build/android/libpanelmod.so dist/panelmod/
           (cd dist/panelmod && zip -r ../../panelmod.levipack .)
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
