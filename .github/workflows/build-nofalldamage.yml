@@ -1,7 +1,11 @@
-name: Build NoFallDamage Mod
+name: Build NoFallDamage LeviPack
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'nofalldamage-mod.zip'
+      - '.github/workflows/build-nofalldamage.yml'
 
 jobs:
   build:
@@ -9,29 +13,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract source ZIP
-        run: unzip -o nofalldamage-mod.zip -d work
-
-      - name: Setup Android SDK and NDK
+      - name: Setup Android NDK
         uses: android-actions/setup-android@v3
         with:
           packages: ndk;27.2.12479018 cmake;3.31.6 ninja
 
-      - name: Configure CMake with Preloader SDK
+      - name: Extract source ZIP
+        run: |
+          unzip -o nofalldamage-mod.zip -d work
+          test -f work/nofalldamage-mod/src/main.cpp
+          test -f work/nofalldamage-mod/manifest.json
+
+      - name: Configure
         run: |
           cat > work/nofalldamage-mod/CMakeLists.txt <<'CMAKE'
           cmake_minimum_required(VERSION 3.22)
           project(nofalldamage LANGUAGES CXX)
           set(CMAKE_CXX_STANDARD 20)
           set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
           include(FetchContent)
           FetchContent_Declare(preloader
             GIT_REPOSITORY https://github.com/LiteLDev/preloader-android.git
-            GIT_TAG main
-          )
+            GIT_TAG 0.2.3)
           FetchContent_MakeAvailable(preloader)
-
           add_library(nofalldamage SHARED src/main.cpp)
           target_link_libraries(nofalldamage PRIVATE preloader android log)
           CMAKE
@@ -42,21 +46,18 @@ jobs:
             -DANDROID_PLATFORM=android-24 \
             -DCMAKE_BUILD_TYPE=Release
 
-      - name: Compile native library
-        run: cmake --build build/nofall --target nofalldamage
+      - name: Compile
+        run: cmake --build build/nofall
 
-      - name: Package LeviPack
+      - name: Create LeviPack
         run: |
-          mkdir -p dist/nofalldamage
-          cp work/nofalldamage-mod/manifest.json dist/nofalldamage/
-          cp build/nofall/libnofalldamage.so dist/nofalldamage/
-          cd dist/nofalldamage
+          mkdir -p dist/nofall
+          cp work/nofalldamage-mod/manifest.json dist/nofall/
+          cp build/nofall/libnofalldamage.so dist/nofall/
+          cd dist/nofall
           zip -r ../../NoFallDamageMod.levipack .
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: NoFallDamageMod
-          path: |
-            build/nofall/libnofalldamage.so
-            NoFallDamageMod.levipack
+          name: NoFallDamageMod-levipack
+          path: NoFallDamageMod.levipack
