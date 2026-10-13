@@ -7,18 +7,21 @@ on:
       - 'nofalldamage-mod.zip'
       - '.github/workflows/build-nofalldamage.yml'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Android NDK
+      - name: Setup Android NDK and CMake
         uses: android-actions/setup-android@v3
         with:
           packages: ndk;27.2.12479018 cmake;3.31.6 ninja
 
-      - name: Extract source ZIP
+      - name: Extract source
         run: |
           unzip -o nofalldamage-mod.zip -d work
           test -f work/nofalldamage-mod/src/main.cpp
@@ -32,12 +35,15 @@ jobs:
           set(CMAKE_CXX_STANDARD 20)
           set(CMAKE_CXX_STANDARD_REQUIRED ON)
           include(FetchContent)
-          FetchContent_Declare(preloader
+          FetchContent_Declare(preloader_android
             GIT_REPOSITORY https://github.com/LiteLDev/preloader-android.git
-            GIT_TAG 0.2.3)
-          FetchContent_MakeAvailable(preloader)
+            GIT_TAG main)
+          FetchContent_MakeAvailable(preloader_android)
+          if(NOT TARGET preloader)
+            message(FATAL_ERROR "Preloader target missing")
+          endif()
           add_library(nofalldamage SHARED src/main.cpp)
-          target_link_libraries(nofalldamage PRIVATE preloader android log)
+          target_link_libraries(nofalldamage PRIVATE preloader log)
           CMAKE
 
           cmake -S work/nofalldamage-mod -B build/nofall -G Ninja \
@@ -47,17 +53,30 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release
 
       - name: Compile
-        run: cmake --build build/nofall
+        run: cmake --build build/nofall --target nofalldamage --parallel 2
 
-      - name: Create LeviPack
+      - name: Package LeviPack
         run: |
+          test -f build/nofall/libnofalldamage.so
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('work/nofalldamage-mod/manifest.json')
+          m = json.loads(p.read_text())
+          m['type'] = 'preload-native'
+          m['name'] = 'No Fall Damage'
+          m['entry'] = 'libnofalldamage.so'
+          p.write_text(json.dumps(m, indent=2) + '\n')
+          PY
           mkdir -p dist/nofall
           cp work/nofalldamage-mod/manifest.json dist/nofall/
           cp build/nofall/libnofalldamage.so dist/nofall/
-          cd dist/nofall
-          zip -r ../../NoFallDamageMod.levipack .
+          (cd dist/nofall && zip -r ../../nofalldamage.levipack .)
+          unzip -l nofalldamage.levipack
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload LeviPack
+        uses: actions/upload-artifact@v4
         with:
-          name: NoFallDamageMod-levipack
-          path: NoFallDamageMod.levipack
+          name: nofalldamage-levipack
+          path: nofalldamage.levipack
+          if-no-files-found: error
