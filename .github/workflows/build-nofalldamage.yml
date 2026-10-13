@@ -1,5 +1,6 @@
+name: Build NoFallDamage
 on: [push, workflow_dispatch]
-name: Build NoFallDamage LeviPack
+
 
 on:
   workflow_dispatch:
