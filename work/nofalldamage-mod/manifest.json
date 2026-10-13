@@ -1,0 +1,9 @@
+{
+  "name": "No Fall Damage",
+  "id": "com.example.nofalldamage",
+  "version": "1.0.0",
+  "authors": ["User"],
+  "description": "Toggles fall damage off/on for the player.",
+  "entry": "libnofalldamage.so",
+  "type": "native"
+}
