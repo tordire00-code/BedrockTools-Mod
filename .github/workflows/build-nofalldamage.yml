@@ -1,0 +1,24 @@
+name: Build NoFallDamage
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract mod
+        run: unzip -o nofalldamage-mod.zip -d work
+
+      - name: Setup Android NDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: ndk;27.2.12479018 cmake;3.31.6 ninja
+
+      - name: Check SDK requirement
+        run: |
+          cat work/nofalldamage-mod/CMakeLists.txt
+          find . -name 'LeviLaminaConfig.cmake' -o -name 'preloader-config.cmake'
+
