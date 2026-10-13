@@ -10,7 +10,7 @@ jobs:
       - name: Unzip project
         run: |
           mkdir -p work
-          unzip -q levi-panel-mod-v5.zip -d work
+          unzip -q levi-panel-mod-v6.zip -d work
       - name: Setup NDK + CMake
         uses: android-actions/setup-android@v3
         with:
