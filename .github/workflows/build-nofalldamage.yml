@@ -1,5 +1,4 @@
 name: Build NoFallDamage
-on: [push, workflow_dispatch]
 
 
 on:
