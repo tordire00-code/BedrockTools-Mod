@@ -13,8 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Unzip project
         run: |
-          mkdir -p work
-          unzip -q "$(ls nofalldamage-mod*.zip | head -n1)" -d work
+          rm -rf work && mkdir -p work
+          unzip -oq "$(ls nofalldamage-mod*.zip | head -n1)" -d work
       - name: Setup NDK + CMake
         uses: android-actions/setup-android@v3
         with:
