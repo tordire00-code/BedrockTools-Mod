@@ -1,7 +1,10 @@
 name: build-levipack
 on:
   push:
+    paths:
+      - 'levi-panel-mod*.zip'
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -5,6 +5,7 @@ on:
       - 'nofalldamage-mod*.zip'
       - '.github/workflows/build-nofall.yml'
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
