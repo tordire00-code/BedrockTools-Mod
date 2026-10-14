@@ -2,7 +2,7 @@ name: build-nofall
 on:
   push:
     paths:
-      - 'nofalldamage-mod.zip'
+      - 'nofalldamage-mod*.zip'
       - '.github/workflows/build-nofall.yml'
   workflow_dispatch:
 jobs:
@@ -13,7 +13,7 @@ jobs:
       - name: Unzip project
         run: |
           mkdir -p work
-          unzip -q nofalldamage-mod.zip -d work
+          unzip -q "$(ls nofalldamage-mod*.zip | head -n1)" -d work
       - name: Setup NDK + CMake
         uses: android-actions/setup-android@v3
         with:
