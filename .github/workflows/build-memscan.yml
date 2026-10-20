@@ -2,7 +2,7 @@ name: build-memscan
 on:
   push:
     paths:
-      - '2memscan-mod*.zip'
+      - '3memscan-mod*.zip'
       - '.github/workflows/build-memscan.yml'
   workflow_dispatch:
 jobs:
@@ -13,7 +13,7 @@ jobs:
       - name: Unzip project
         run: |
           rm -rf work && mkdir -p work
-          unzip -oq "$(ls 2memscan-mod*.zip | head -n1)" -d work
+          unzip -oq "$(ls 3memscan-mod*.zip | head -n1)" -d work
           ls work/memscan-mod
       - name: Setup NDK + CMake
         uses: android-actions/setup-android@v3
